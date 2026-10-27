@@ -1885,6 +1885,14 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 		$this->aliasNbPgGp = $alias;
 	}
 
+	/**
+	 * PDF/A-2 and PDF/A-3 permit transparency; PDF/A-1 and the supported PDF/X profile do not.
+	 */
+	public function isTransparencyAllowed()
+	{
+		return !$this->PDFX && (!$this->PDFA || preg_match('/^[23]-/i', $this->PDFAversion) === 1);
+	}
+
 	function SetAlpha($alpha, $bm = 'Normal', $return = false, $mode = 'B')
 	{
 		// alpha: real value from 0 (transparent) to 1 (opaque)
@@ -1893,7 +1901,7 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 		//          HardLight, SoftLight, Difference, Exclusion, Hue, Saturation, Color, Luminosity
 		// set alpha for stroking (CA) and non-stroking (ca) operations
 		// mode determines F (fill) S (stroke) B (both)
-		if (($this->PDFA || $this->PDFX) && $alpha != 1) {
+		if (!$this->isTransparencyAllowed() && $alpha != 1) {
 			if (($this->PDFA && !$this->PDFAauto) || ($this->PDFX && !$this->PDFXauto)) {
 				$this->PDFAXwarnings[] = "Image opacity must be 100% (Opacity changed to 100%)";
 			}
