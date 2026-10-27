@@ -247,7 +247,7 @@ class ImageProcessor implements \Psr\Log\LoggerAwareInterface
 			return $this->imageError('', false, 'GD library needed to parse image files');
 		}
 
-		if ($this->mpdf->PDFA || $this->mpdf->PDFX) {
+		if (!$this->mpdf->isTransparencyAllowed()) {
 			$mask = false;
 		}
 
@@ -343,7 +343,7 @@ class ImageProcessor implements \Psr\Log\LoggerAwareInterface
 			// Read transparency info
 			$trns = [];
 			$trnsrgb = false;
-			if (!$this->mpdf->PDFA && !$this->mpdf->PDFX && !$mask) {  // mPDF 6 added NOT mask
+			if ($this->mpdf->isTransparencyAllowed() && !$mask) {  // mPDF 6 added NOT mask
 				$p = strpos($data, 'tRNS');
 				if ($p) {
 					$n = $this->fourBytesToInt(substr($data, ($p - 4), 4));
@@ -862,7 +862,7 @@ class ImageProcessor implements \Psr\Log\LoggerAwareInterface
 			// Convert to Grayscale image stream - nominally returned as type='png'
 			$info = $this->convertImage($data, $colspace, 'DeviceGray', $w, $h, $ppUx, $pngalpha, $gamma, $ct); // mPDF 5.7.2 Gamma correction
 
-		} elseif (($this->mpdf->PDFA || $this->mpdf->PDFX) && $pngalpha) {
+		} elseif (!$this->mpdf->isTransparencyAllowed() && $pngalpha) {
 
 			// Remove alpha channel
 			if ($this->mpdf->restrictColorSpace === 1) { // Grayscale
@@ -895,7 +895,7 @@ class ImageProcessor implements \Psr\Log\LoggerAwareInterface
 
 			// Alpha channel set (including using tRNS for Paletted images)
 			if ($pngalpha) {
-				if ($this->mpdf->PDFA) {
+				if (!$this->mpdf->isTransparencyAllowed()) {
 					throw new \Mpdf\MpdfException(sprintf('PDFA1-b does not permit images with alpha channel transparency (%s).', $file));
 				}
 

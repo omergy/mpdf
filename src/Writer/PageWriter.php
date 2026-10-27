@@ -188,7 +188,7 @@ final class PageWriter
 			$this->writer->write('/Resources 2 0 R');
 
 			// Important to keep in RGB colorSpace when using transparency
-			if (!$this->mpdf->PDFA && !$this->mpdf->PDFX) {
+			if ($this->mpdf->isTransparencyAllowed()) {
 				if ($this->mpdf->restrictColorSpace === 3) {
 					$this->writer->write('/Group << /Type /Group /S /Transparency /CS /DeviceCMYK >> ');
 				} elseif ($this->mpdf->restrictColorSpace === 1) {

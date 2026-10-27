@@ -113,11 +113,13 @@ final class ResourceWriter implements \Psr\Log\LoggerAwareInterface
 
 		$this->imageWriter->writeImages();
 
+		// SVG resource dictionaries need the shading and soft-mask object numbers.
+		$this->backgroundWriter->writeShaders();
+
 		$this->formWriter->writeFormObjects();
 
 		$this->mpdf->writeImportedPagesAndResolvedObjects();
 
-		$this->backgroundWriter->writeShaders();
 		$this->backgroundWriter->writePatterns();
 
 		// Resource dictionary
