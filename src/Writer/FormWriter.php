@@ -128,6 +128,15 @@ final class FormWriter
             $resources[] = '/Font <<' . implode('', $fonts) . '>>';
         }
 
+        $images = [];
+        foreach ($this->mpdf->images as $image) {
+            $images[] = '/I' . $image['i'] . ' ' . $image['n'] . ' 0 R';
+        }
+
+        if ($images !== []) {
+            $resources[] = '/XObject <<' . implode('', $images) . '>>';
+        }
+
         $resources[] = '/ProcSet [/PDF /Text /ImageB /ImageC /ImageI]';
 
         return implode('', $resources);
